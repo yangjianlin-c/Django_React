@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>注册验证码</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            font-size: 0.9em;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            padding: 32px 24px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        .brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .title {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 24px 0 12px 0;
+        }
+
+        .desc {
+            color: #444;
+            margin-bottom: 24px;
+            line-height: 1.8em;
+        }
+
+        .greeting {
+            margin: 16px 0;
+        }
+
+        .footer {
+            color: #888;
+            font-size: 0.95em;
+            margin-top: 32px;
+            border-top: 1px solid #eee;
+            padding-top: 16px;
+        }
+
+        .contact {
+            margin-top: 8px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: rgb(24, 24, 27);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 18px;
+        }
+
+        .code {
+            font-size: 1.4em;
+            color: #d7263d;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div>
+            {% if logo_url %}<img src="{{ logo_url }}" alt="logo" class="logo">{% endif %}
+            <span class="brand">米克网</span>
+        </div>
+        <div class="title">注册验证码</div>
+        <div class="desc">亲爱的 {{ username }}，<br>您的注册验证码如下：</div>
+        <div class="code">{{ code }}</div>
+        <div class="greeting">验证码有效期为{{ expire_minutes }}分钟，请尽快完成注册。</div>
+        <div class="footer">
+            此致，<br>
+            米克网团队<br>
+            <div class="contact">如需帮助，请联系：<a href="mailto:{{ support_email }}">{{ support_email }}</a></div>
+            <div style="margin-top:8px;">&copy; 2025 米克网. 保留所有权利。</div>
+        </div>
+    </div>
+</body>
+
+</html>
