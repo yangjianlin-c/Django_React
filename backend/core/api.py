@@ -1,6 +1,7 @@
-from ninja import NinjaAPI
 from courses.api import course_router
 from users.api import user_router
+from ninja import NinjaAPI
+
 
 api = NinjaAPI()
 

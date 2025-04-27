@@ -1,5 +1,3 @@
-# 用户相关API接口拆分文件
-
 from ninja import Router
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.hashers import check_password
@@ -10,6 +8,8 @@ from users.models import UserProfile
 from courses.models import Order, Course
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from ninja.security import django_auth
+from django.contrib.auth.decorators import login_required
 
 user_router = Router(tags=["user"])
 
@@ -68,12 +68,25 @@ class OrderSchema(BaseModel):
 
 
 # 用户相关接口
+
+
+@login_required
+@user_router.get("/check_login")
+def check_login(request):
+    return {"success": True, "message": "已登录"}
+
+
 @user_router.post("/login", response=LoginResponse)
 def login(request, data: LoginSchema):
     user = authenticate(username=data.username, password=data.password)
     if user is not None:
         auth_login(request, user)
-        return {"success": True, "message": "登录成功"}
+        return {
+            "success": True,
+            "message": "Login successful",
+            "sessionid": request.session.session_key,
+            "csrftoken": request.COOKIES.get("csrftoken"),
+        }
     else:
         return {"success": False, "message": "用户名或密码错误"}
 
@@ -84,15 +97,9 @@ def logout(request):
     return {"success": True, "message": "已登出"}
 
 
-@user_router.get("/me", response=UserProfileSchema)
+@user_router.get("/me", response=UserProfileSchema, auth=django_auth)
 def get_me(request):
-    user = (
-        request.user
-        if hasattr(request, "user") and request.user.is_authenticated
-        else None
-    )
-    if not user:
-        raise HttpError(401, "未登录")
+    user = request.auth
     profile = getattr(user, "profile", None)
     return {
         "username": user.username,
