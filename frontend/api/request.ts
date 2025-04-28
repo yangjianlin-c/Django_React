@@ -1,40 +1,33 @@
-const BASE_URL = "http://127.0.0.1:8000"; // 根据你的 Django 后端实际地址调整
+import axios from 'axios';
+import { getAccessToken, removeAccessToken } from './auth';
 
-export async function apiRequest<T>(
-  url: string,
-  options?: RequestInit
-): Promise<T> {
-  const response = await fetch(BASE_URL + url, {
-    credentials: "include",
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': getCookie('csrftoken'),
-      ...options?.headers,
-    },
-    ...options,
-  });
+// 从环境变量读取后端 API 地址
+const baseURL = process.env.API_BASE_URL || 'http://localhost:8000/api';
 
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
+// 创建 axios 实例
+export const api = axios.create({
+  baseURL: baseURL,
+});
 
-  return response.json();
-
-
-}
-
-  
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
+// 请求拦截器 - 添加 token 到请求头
+api.interceptors.request.use(
+  (config) => {
+    // 获取存储的 access token
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return cookieValue;
-}
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// 响应拦截器 - 处理错误
+api.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(error)
+);
+
+export default api;

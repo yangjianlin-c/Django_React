@@ -1,94 +1,84 @@
-from ninja import Router
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.contrib.auth.hashers import check_password
-from ninja.errors import HttpError
 from typing import List
-from pydantic import BaseModel
-from users.models import UserProfile
-from courses.models import Order, Course
+
+from django.contrib.auth import authenticate, logout as auth_logout
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from ninja.security import django_auth
-from django.contrib.auth.decorators import login_required
+
+from ninja import Router
+from ninja.errors import HttpError
+from ninja.security import HttpBearer
+
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from pydantic import BaseModel
+
+from courses.models import Course, Order
+from users.models import UserProfile
+
+from .schemas import (
+    ChangePasswordSchema,
+    EmailSchema,
+    LoginSchema,
+    OrderSchema,
+    UpdateProfileSchema,
+    UserCreateSchema,
+    UserProfileSchema,
+)
+
 
 user_router = Router(tags=["user"])
 
 
-# 用户相关序列化类
-class LoginSchema(BaseModel):
-    username: str
-    password: str
-
-
-class LoginResponse(BaseModel):
-    success: bool
-    message: str
-
-
-class UserProfileSchema(BaseModel):
-    username: str
-    email: str = ""
-    first_name: str = ""
-    last_name: str = ""
-    role: str = "user"
-    vip_expiry_date: str | None = None
-
-    class Config:
-        orm_mode = True
-
-
-class ChangePasswordSchema(BaseModel):
-    old_password: str
-    new_password: str
-
-
-class UpdateProfileSchema(BaseModel):
-    email: str = ""
-    first_name: str = ""
-    last_name: str = ""
-
-
-class EmailSchema(BaseModel):
-    subject: str
-    message: str
-    recipient: str
-    html_message: str = ""
-
-
-class OrderSchema(BaseModel):
-    order_number: str
-    course: int
-    price: float
-    status: str
-    payment_method: str = ""
-    created_at: str = ""
-
-    class Config:
-        orm_mode = True
+class JWTAuth(HttpBearer):
+    def authenticate(self, request, token):
+        try:
+            auth = JWTAuthentication()
+            validated_token = auth.get_validated_token(token)
+            user = auth.get_user(validated_token)
+            return user
+        except Exception:
+            return None
 
 
 # 用户相关接口
+@user_router.post("/register")
+def register(request, data: UserCreateSchema):
+    # 检查用户名是否已存在
+    if User.objects.filter(username=data.username).exists():
+        raise HttpError(400, "用户名已存在")
+
+    user = User.objects.create_user(
+        username=data.username, email=data.email, password=data.password
+    )
+    # 生成 JWT 令牌
+    refresh = RefreshToken.for_user(user)
+    # 返回响应
+    return {
+        "message": "User created successfully!",
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+    }
 
 
-@login_required
-@user_router.get("/check_login")
-def check_login(request):
-    return {"success": True, "message": "已登录"}
-
-
-@user_router.post("/login", response=LoginResponse)
+@user_router.post("/login")
 def login(request, data: LoginSchema):
+    try:
+        user = User.objects.get(username=data.username)
+    except User.DoesNotExist:
+        raise HttpError(404, "用户名不存在")
+
     user = authenticate(username=data.username, password=data.password)
     if user is not None:
-        auth_login(request, user)
+        refresh = RefreshToken.for_user(user)
         return {
-            "success": True,
-            "message": "Login successful",
-            "sessionid": request.session.session_key,
-            "csrftoken": request.COOKIES.get("csrftoken"),
+            "message": "登录成功",
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
         }
-    else:
-        return {"success": False, "message": "用户名或密码错误"}
+    raise HttpError(401, "用户名或密码错误")
 
 
 @user_router.post("/logout")
@@ -97,7 +87,7 @@ def logout(request):
     return {"success": True, "message": "已登出"}
 
 
-@user_router.get("/me", response=UserProfileSchema, auth=django_auth)
+@user_router.get("/me", auth=[JWTAuth()])
 def get_me(request):
     user = request.auth
     profile = getattr(user, "profile", None)
@@ -111,15 +101,9 @@ def get_me(request):
     }
 
 
-@user_router.post("/change_password")
+@user_router.post("/change_password", auth=[JWTAuth()])
 def change_password(request, data: ChangePasswordSchema):
-    user = (
-        request.user
-        if hasattr(request, "user") and request.user.is_authenticated
-        else None
-    )
-    if not user:
-        raise HttpError(401, "未登录")
+    user = request.auth
     if not check_password(data.old_password, user.password):
         return {"success": False, "message": "原密码错误"}
     user.set_password(data.new_password)
@@ -127,15 +111,9 @@ def change_password(request, data: ChangePasswordSchema):
     return {"success": True, "message": "密码修改成功"}
 
 
-@user_router.post("/update_profile")
+@user_router.post("/update_profile", auth=[JWTAuth()])
 def update_profile(request, data: UpdateProfileSchema):
-    user = (
-        request.user
-        if hasattr(request, "user") and request.user.is_authenticated
-        else None
-    )
-    if not user:
-        raise HttpError(401, "未登录")
+    user = request.auth
     user.email = data.email
     user.first_name = data.first_name
     user.last_name = data.last_name
@@ -143,15 +121,9 @@ def update_profile(request, data: UpdateProfileSchema):
     return {"success": True, "message": "资料更新成功"}
 
 
-@user_router.get("/orders", response=List[OrderSchema])
+@user_router.get("/orders", response=List[OrderSchema], auth=[JWTAuth()])
 def list_orders(request):
-    user = (
-        request.user
-        if hasattr(request, "user") and request.user.is_authenticated
-        else None
-    )
-    if not user:
-        raise HttpError(401, "未登录")
+    user = request.auth
     orders = Order.objects.filter(user=user)
     return orders
 
@@ -196,15 +168,9 @@ def send_welcome_email(request, data: EmailSchema):
         return {"success": False, "message": f"欢迎邮件发送失败: {str(e)}"}
 
 
-@user_router.get("/my_courses", response=List[CourseSchema])
+@user_router.get("/my_courses", response=List[CourseSchema], auth=[JWTAuth()])
 def list_my_courses(request):
-    user = (
-        request.user
-        if hasattr(request, "user") and request.user.is_authenticated
-        else None
-    )
-    if not user:
-        raise HttpError(401, "未登录")
+    user = request.auth
     profile = getattr(user, "profile", None)
     if (
         profile

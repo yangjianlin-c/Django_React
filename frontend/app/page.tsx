@@ -4,7 +4,7 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { Container } from "@/components/ui/container"
-// import { SiteHeader } from "@/components/site-header"
+import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tag } from "lucide-react"
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 export default function IndexPage() {
   return (
     <>
-
+      <SiteHeader />
       <main className="flex-1">
         <section>
           <Container>

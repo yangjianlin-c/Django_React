@@ -1,5 +1,5 @@
 django
 django-ninja
-django-ninja-jwt
+djangorestframework-simplejwt
 Pillow
 django-cors-headers
