@@ -1,16 +1,17 @@
 "use client"
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { login } from "@/api/auth";
+import { register } from "@/api/auth";
 
-export default function LoginPage() {
+export default function RegisterPage() {
     const router = useRouter()
-    const searchParams = useSearchParams()
     const [username, setUsername] = useState("")
+    const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
@@ -19,15 +20,18 @@ export default function LoginPage() {
         e.preventDefault()
         setLoading(true)
         setError("")
-
         try {
-            const response = await login(username, password);  // 调用封装的login函数
+            const response = await register({ username, email, password });
+            console.log(response);
             if (response.status === 200) {
-                router.push("/")
+                // 注册成功，自动登录
+                localStorage.setItem('access_token', response.data.access);
+                localStorage.setItem('refresh_token', response.data.refresh);
+                router.push("/") // 跳转到主页
             }
         } catch (err: any) {
             console.error(err);
-            setError(err?.response?.data?.detail || "登录失败")
+            setError(err?.data?.detail || "注册失败")
         } finally {
             setLoading(false)
         }
@@ -42,37 +46,38 @@ export default function LoginPage() {
                             <form onSubmit={handleSubmit} className="p-6 md:p-8">
                                 <div className="flex flex-col gap-6">
                                     <div className="flex flex-col items-center text-center">
-                                        <h1 className="text-2xl font-bold">欢迎登入米克网</h1>
+                                        <h1 className="text-2xl font-bold">注册账户</h1>
                                         <p className="text-sm text-muted-foreground">
                                             探索未知的世界，发现美好事物
                                         </p>
                                     </div>
                                     {error && <div className="text-red-500 text-sm text-center">{error}</div>}
                                     <div className="grid gap-2">
-                                        <Label htmlFor="email">用户名</Label>
+                                        <Label htmlFor="username">用户名</Label>
                                         <Input
                                             type="text"
-                                            value={username}
                                             name="username"
+                                            value={username}
                                             onChange={e => setUsername(e.target.value)}
                                             placeholder="请输入用户名"
                                             required
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <div className="flex items-center">
-                                            <Label htmlFor="password">密码</Label>
-                                            <a
-                                                href="#"
-                                                className="ml-auto text-sm underline-offset-2 hover:underline"
-                                                tabIndex="-1"
-                                            >
-                                                忘记密码?
-                                            </a>
-                                        </div>
+                                        <Label htmlFor="email">邮箱</Label>
+                                        <Input
+                                            type="email"
+                                            name="email"
+                                            value={email}
+                                            onChange={e => setEmail(e.target.value)}
+                                            placeholder="请输入邮箱"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="password">密码</Label>
                                         <Input
                                             type="password"
-                                            name="password"
                                             value={password}
                                             onChange={e => setPassword(e.target.value)}
                                             placeholder="请输入密码"
@@ -80,7 +85,7 @@ export default function LoginPage() {
                                         />
                                     </div>
                                     <Button type="submit" className="w-full" disabled={loading}>
-                                        {loading ? "登录中..." : "登录"}
+                                        {loading ? "注册中..." : "注册"}
                                     </Button>
                                     <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                                         <span className="relative z-10 bg-background px-2 text-muted-foreground">
@@ -88,9 +93,9 @@ export default function LoginPage() {
                                         </span>
                                     </div>
                                     <div className="text-center text-sm">
-                                        没有账户?
-                                        <a href="/register" className="px-2 underline underline-offset-4">
-                                            注册
+                                        已有账户?
+                                        <a href="/auth/login" className="px-2 underline underline-offset-4">
+                                            登录
                                         </a>
                                     </div>
                                 </div>

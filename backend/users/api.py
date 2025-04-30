@@ -183,3 +183,36 @@ def list_my_courses(request):
         "course_id", flat=True
     )
     return Course.objects.filter(id__in=course_ids)
+
+
+@user_router.post("/upload_avatar", auth=[JWTAuth()])
+def upload_avatar(request):
+    user = request.auth
+    profile = getattr(user, "profile", None)
+
+    if not request.FILES or "avatar" not in request.FILES:
+        raise HttpError(400, "请上传头像文件")
+
+    avatar_file = request.FILES["avatar"]
+
+    # 检查文件类型
+    allowed_types = ["image/jpeg", "image/png", "image/gif"]
+    if avatar_file.content_type not in allowed_types:
+        raise HttpError(400, "不支持的文件类型，请上传JPG、PNG或GIF格式的图片")
+
+    # 检查文件大小（限制为5MB）
+    if avatar_file.size > 5 * 1024 * 1024:
+        raise HttpError(400, "文件大小超过限制（最大5MB）")
+
+    if not profile:
+        profile = UserProfile.objects.create(user=user)
+
+    # 保存头像
+    profile.avatar = avatar_file
+    profile.save()
+
+    return {
+        "success": True,
+        "message": "头像上传成功",
+        "avatar_url": profile.avatar.url if profile.avatar else "",
+    }
