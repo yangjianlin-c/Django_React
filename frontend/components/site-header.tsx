@@ -20,7 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { isAuthenticated, logout } from "@/api/auth"
+import { logout } from "@/api/auth"
 import { getCurrentUser } from "@/api/auth"
 
 export function SiteHeader() {
@@ -32,21 +32,16 @@ export function SiteHeader() {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const authenticated = isAuthenticated()
-            console.log("authenticated", authenticated)
-            setIsLoggedIn(authenticated)
-
-            if (authenticated) {
-                try {
-                    const response = await getCurrentUser()
-                    console.log("response", response)
-                    setUser({
-                        name: response.username || "用户",
-                        image: response.avatar_url || ""
-                    })
-                } catch (error) {
-                    console.error("获取用户信息失败", error)
-                }
+            try {
+                const response = await getCurrentUser()
+                setIsLoggedIn(true)
+                setUser({
+                    name: response.data.username || "用户",
+                    image: response.data.avatar_url || ""
+                })
+            } catch (error) {
+                console.error("获取用户信息失败", error)
+                setIsLoggedIn(false)
             }
         }
 

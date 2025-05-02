@@ -12,14 +12,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getCurrentUser, updateProfile, uploadAvatar } from "@/api/auth"
-import { isAuthenticated } from "@/api/auth"
 
 const profileFormSchema = z.object({
   username: z.string().min(2, "用户名至少2个字符").max(30, "用户名最多30个字符"),
   email: z.string().email("请输入有效的邮箱地址"),
   bio: z.string().max(160, "个人简介最多160个字符").optional(),
+  avatarUrl: z.string().optional(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
@@ -35,61 +36,43 @@ export default function SettingsPage() {
       username: "",
       email: "",
       bio: "",
+      avatarUrl: "",
     },
   })
 
-  // 检查用户是否已登录
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      toast("请先登录", {
-        description: "需要登录才能访问此页面",
-        type: "error",
-      });
-      router.push("/auth/login");
-      return;
-    }
-  }, [router]);
-
   // 获取用户信息
   useEffect(() => {
-    // 只有在已登录状态下才获取用户信息
-    if (isAuthenticated()) {
-      const fetchUserProfile = async () => {
-        try {
-          // 添加调试信息
-          console.log('正在获取用户信息...');
-          const token = localStorage.getItem('token');
-          console.log('当前token:', token ? '已设置' : '未设置');
+    const fetchUserProfile = async () => {
+      try {
+        const userData = await getCurrentUser();
+        console.log(userData);
 
-          const response = await getCurrentUser();
-          const userData = response.data;
-
-          form.reset({
-            username: userData.username || "",
-            email: userData.email || "",
-            bio: userData.bio || "",
-          });
-
-          if (userData.avatar_url) {
-            setAvatarUrl(userData.avatar_url);
-          }
-        } catch (error) {
-          console.error("获取用户信息失败", error);
-          // 打印更详细的错误信息
-          if (error.response) {
-            console.error("错误状态码:", error.response.status);
-            console.error("错误详情:", error.response.data);
-          }
-
-          toast("获取用户信息失败", {
-            description: "请稍后再试",
-            type: "error",
-          });
+        form.reset({
+          username: userData.data.username || "",
+          email: userData.data.email || "",
+          bio: userData.data.bio || "",
+          avatarUrl: userData.data.avatar_url || "",
+        });
+      } catch (error) {
+        console.error("获取用户信息失败", error);
+        // 打印更详细的错误信息
+        if (error.response) {
+          console.error("错误状态码:", error.response.status);
+          console.error("错误详情:", error.response.data);
         }
-      };
 
-      fetchUserProfile();
-    }
+        toast("获取用户信息失败", {
+          description: "请稍后再试",
+          type: "error",
+        });
+
+        if (error.response?.status === 401) {
+          router.push("/auth/login");
+        }
+      }
+    };
+
+    fetchUserProfile();
   }, [form]);
 
   // 提交表单
@@ -133,7 +116,11 @@ export default function SettingsPage() {
       setLoading(true);
       try {
         const response = await uploadAvatar(file);
-        setAvatarUrl(response.data.avatar_url);
+        const avatarUrl = response.data.avatarUrl;
+        // 确保 avatarUrl 是完整的 URL
+        const fullAvatarUrl = `http://127.0.0.1:8000/${avatarUrl}`;
+        console.log(fullAvatarUrl);
+        setAvatarUrl(fullAvatarUrl);
         toast("上传成功", {
           description: "头像已更新",
           type: "success",
@@ -162,7 +149,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>头像设置</CardTitle>
           <CardDescription>
-            点击头像可以上传新的头像图片
+            点击头像可以上传新的头像图片{avatarUrl}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -232,10 +219,10 @@ export default function SettingsPage() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="bio">个人简介</Label>
-              <Input
+              <Textarea
                 id="bio"
                 {...form.register("bio")}
-                className="w-[400px]"
+                className="w-[400px] h-[100px]"
                 disabled={loading}
               />
               {form.formState.errors.bio && (
@@ -244,6 +231,7 @@ export default function SettingsPage() {
                 </p>
               )}
             </div>
+
             <Button type="submit" disabled={loading}>
               {loading ? "保存中..." : "保存更改"}
             </Button>

@@ -27,7 +27,7 @@ export default function CoursesPage() {
       setIsLoading(true) // 开始加载
       setError(null) // 重置错误状态
       try {
-        const response = await api.get<Course[]>('/users/me/courses') // 注意路径，axios 会自动拼接 baseURL
+        const response = await api.get<Course[]>('/user/my_courses')
         setCourses(response.data)
       } catch (e: any) {
         console.error("获取课程失败:", e)

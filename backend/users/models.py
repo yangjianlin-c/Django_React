@@ -13,6 +13,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     role = models.CharField(max_length=10, choices=USER_ROLES, default="regular")
     vip_expiry_date = models.DateTimeField(null=True, blank=True)
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
 
     def is_vip_valid(self):
         if self.role != "vip":

@@ -1,4 +1,4 @@
-import { api } from "./request";
+import { api,backURL } from "./request";
 
 // 通用的 token 操作函数
 const tokenStorage = (tokenType: 'access' | 'refresh', token?: string): string | void => {
@@ -60,11 +60,15 @@ export const logout = () => {
 export const changePassword = (data: { old_password: string; new_password: string }) => 
   api.post("user/change_password", data);
 
-// 检查是否已登录
-export const isAuthenticated = (): boolean => !!getAccessToken();
 
-// 获取当前用户信息
-export const getCurrentUser = async () => (await api.get('/user/me')).data;
+export const getCurrentUser = async () => {
+  const response = await api.get('/user/me');
+
+  if (response.data && response.data.avatar_url) {
+    response.data.avatar_url = `${backURL}${response.data.avatar_url}`;
+  }  
+  return response;
+};
 
 // 更新个人信息
 export const updateProfile = (data: any) => api.post("user/update_profile", data);

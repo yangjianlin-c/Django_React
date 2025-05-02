@@ -22,7 +22,7 @@ export default function IndexPage() {
         const fetchCourses = async () => {
             try {
                 const response = await listCourses()
-                setCourses(response.data)
+                setCourses(response.data.items)
                 setError(null)
             } catch (err) {
                 setError('获取课程列表失败')
@@ -64,7 +64,7 @@ export default function IndexPage() {
                                     width={300}
                                     height={240}
                                     className="w-full organic-radius"
-
+                                    loading="lazy"
                                 />
                             </div>
                         </div>

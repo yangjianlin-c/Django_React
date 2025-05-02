@@ -13,8 +13,6 @@ from ninja.security import HttpBearer
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from pydantic import BaseModel
-
 from courses.models import Course, Order
 from users.models import UserProfile
 
@@ -27,6 +25,7 @@ from .schemas import (
     UserCreateSchema,
     UserProfileSchema,
 )
+from courses.schemas import CourseSchema
 
 
 user_router = Router(tags=["user"])
@@ -98,6 +97,7 @@ def get_me(request):
         "last_name": user.last_name,
         "role": getattr(profile, "role", "user"),
         "vip_expiry_date": getattr(profile, "vip_expiry_date", None) or "",
+        "avatar_url": profile.avatar.url or "",
     }
 
 
@@ -126,21 +126,6 @@ def list_orders(request):
     user = request.auth
     orders = Order.objects.filter(user=user)
     return orders
-
-
-from courses.models import Course
-
-
-class CourseSchema(BaseModel):
-    id: int
-    title: str
-    description: str = ""
-    price: int
-    thumbnail: str = ""
-    feature: bool = False
-
-    class Config:
-        orm_mode = True
 
 
 @user_router.post("/send_welcome_email")
@@ -191,28 +176,29 @@ def upload_avatar(request):
     profile = getattr(user, "profile", None)
 
     if not request.FILES or "avatar" not in request.FILES:
-        raise HttpError(400, "请上传头像文件")
+        raise HttpError(400, "Please upload an avatar file")
 
     avatar_file = request.FILES["avatar"]
 
-    # 检查文件类型
+    # Check file type
     allowed_types = ["image/jpeg", "image/png", "image/gif"]
     if avatar_file.content_type not in allowed_types:
-        raise HttpError(400, "不支持的文件类型，请上传JPG、PNG或GIF格式的图片")
+        raise HttpError(400, "Unsupported file type. Please upload JPG, PNG, or GIF.")
 
-    # 检查文件大小（限制为5MB）
+    # Check file size (limit to 5MB)
     if avatar_file.size > 5 * 1024 * 1024:
-        raise HttpError(400, "文件大小超过限制（最大5MB）")
+        raise HttpError(400, "File size exceeds the limit (max 5MB)")
 
     if not profile:
         profile = UserProfile.objects.create(user=user)
 
-    # 保存头像
-    profile.avatar = avatar_file
-    profile.save()
+    # Save avatar
+    profile.avatar.save(avatar_file.name, avatar_file, save=True)  # 保存文件到服务器
+    # Refresh from db to get the url
+    profile.refresh_from_db()
 
     return {
         "success": True,
-        "message": "头像上传成功",
+        "message": "Avatar uploaded successfully",
         "avatar_url": profile.avatar.url if profile.avatar else "",
     }
