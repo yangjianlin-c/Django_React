@@ -1,16 +1,15 @@
-from pydantic import BaseModel
 from ninja import Schema
+from typing import Optional
+from ninja.orm import create_schema
+from courses.models import Lesson
 
 
-class LessonSchema(Schema):
+class TagSchema(Schema):
     id: int
-    title: str
-    free_preview: bool
-    video_source: str
-    video_url: str
-    content: str
-    created_at: str
-    updated_at: str
+    name: str
+
+
+LessonSchema = create_schema(Lesson)
 
 
 class CourseSchema(Schema):

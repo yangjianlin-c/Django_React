@@ -1,7 +1,10 @@
 
 pip install -r requirements.txt
+.venv\Scripts\activate
 python manage.py makemigrations
 python manage.py migrate
+python manage.py loaddata data.json
+
 
 python manage.py showmigrations
 python manage.py migrate courses 0007_course_feature

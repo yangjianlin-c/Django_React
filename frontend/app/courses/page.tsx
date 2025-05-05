@@ -11,7 +11,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tag } from "lucide-react"
 
-import { listCourses } from "@/api/course"
+import { listCourses, listTags } from "@/api/course"
 
 const title = "在线课程"
 const description = "米克网提供的电子产品热管理在线课程"
@@ -38,34 +38,30 @@ interface CoursesPageProps {
 
 export default function CoursesPage({ params, searchParams }: CoursesPageProps) {
     const [courses, setCourses] = useState<Course[]>([])
+    const [tags, setTags] = useState<Tag[]>([])
     const [loading, setLoading] = useState(true)
-    const [selectedCategory, setSelectedCategory] = useState<string>("")
+    const [selectedTagId, setSelectedTagId] = useState<number | null>(null)
 
     useEffect(() => {
-        const fetchCourses = async () => {
+        const fetchData = async () => {
             try {
-                const response = await listCourses()
-                setCourses(Array.isArray(response.items) ? response.items : [])
+                const [coursesResponse, tagsResponse] = await Promise.all([
+                    listCourses(selectedTagId || undefined),
+                    listTags()
+                ])
+                setCourses(Array.isArray(coursesResponse.data.items) ? coursesResponse.data.items : [])
+                setTags(tagsResponse.data || [])
             } catch (error) {
-                console.error("获取课程列表失败:", error)
+                console.error("获取数据失败:", error)
                 setCourses([])
+                setTags([])
             } finally {
                 setLoading(false)
             }
         }
 
-        fetchCourses()
-    }, [])
-
-    // Only calculate categories and filtered courses if courses is an array
-    const categories = Array.isArray(courses)
-        ? [...new Set(courses.flatMap(course => course.tags?.map(tag => tag.name) || []))]
-        : []
-    const filteredCourses = Array.isArray(courses)
-        ? (selectedCategory
-            ? courses.filter(course => course.tags?.some(tag => tag.name === selectedCategory))
-            : courses)
-        : []
+        fetchData()
+    }, [selectedTagId])
 
     return (
         <>
@@ -88,31 +84,31 @@ export default function CoursesPage({ params, searchParams }: CoursesPageProps) 
                             <div className="flex justify-center space-x-2 pb-8">
                                 <Button
                                     key="all-categories"
-                                    variant={!selectedCategory ? "default" : "outline"}
+                                    variant={!selectedTagId ? "default" : "outline"}
                                     size="sm"
-                                    onClick={() => setSelectedCategory("")}
+                                    onClick={() => setSelectedTagId(null)}
                                 >
                                     全部
                                 </Button>
-                                {categories.map((category) => (
+                                {tags.map((tag) => (
                                     <Button
-                                        key={category}
-                                        variant={selectedCategory === category ? "default" : "outline"}
+                                        key={tag.id}
+                                        variant={selectedTagId === tag.id ? "default" : "outline"}
                                         size="sm"
-                                        onClick={() => setSelectedCategory(category)}
+                                        onClick={() => setSelectedTagId(tag.id)}
                                     >
-                                        {category}
+                                        {tag.name}
                                     </Button>
                                 ))}
                             </div>
 
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                                {filteredCourses.map((course) => (
+                                {courses.map((course) => (
                                     <Card key={course.id} className="pt-0">
-                                        <Link href={`/courses/${course.id}`}>
+                                        <Link href={`/course/${course.id}`}>
                                             <div className="overflow-hidden rounded-t-lg">
                                                 <Image
-                                                    src={course.image || "/placeholder.png"}
+                                                    src={course.thumbnail ? course.thumbnail : `/${course.id}.png`}
                                                     alt={course.title}
                                                     width={400}
                                                     height={200}
@@ -130,7 +126,7 @@ export default function CoursesPage({ params, searchParams }: CoursesPageProps) 
                                         </CardHeader>
                                         <CardFooter>
                                             <Button size="sm" asChild>
-                                                <Link href={`/courses/${course.id}`}>查看详情</Link>
+                                                <Link href={`/course/${course.id}`}>查看详情</Link>
                                             </Button>
                                         </CardFooter>
                                     </Card>

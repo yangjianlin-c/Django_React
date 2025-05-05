@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getCurrentUser, updateProfile, uploadAvatar } from "@/api/auth"
+import { getCurrentUser, updateProfile, uploadAvatar } from "@/api/user"
 
 const profileFormSchema = z.object({
   username: z.string().min(2, "用户名至少2个字符").max(30, "用户名最多30个字符"),
@@ -45,14 +45,14 @@ export default function SettingsPage() {
     const fetchUserProfile = async () => {
       try {
         const userData = await getCurrentUser();
-        console.log(userData);
+        console.log("用户信息:", userData.data);
 
         form.reset({
           username: userData.data.username || "",
           email: userData.data.email || "",
           bio: userData.data.bio || "",
-          avatarUrl: userData.data.avatar_url || "",
         });
+        setAvatarUrl(userData.data.avatar_url || "");
       } catch (error) {
         console.error("获取用户信息失败", error);
         // 打印更详细的错误信息
@@ -149,7 +149,7 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle>头像设置</CardTitle>
           <CardDescription>
-            点击头像可以上传新的头像图片{avatarUrl}
+            点击头像可以上传新的头像图片
           </CardDescription>
         </CardHeader>
         <CardContent>

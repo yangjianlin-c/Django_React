@@ -1,0 +1,323 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$1000000$hNb13KUADVaAwgbrzmbFiz$hPyCzUBibTDMUgL1oC0KdqfqgnYSmJOdKPrtd83P0D0=",
+            "last_login": null,
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "",
+            "last_name": "",
+            "email": "94519510@qq.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2024-05-26T01:56:33.020Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "courses.course",
+        "pk": 1,
+        "fields": {
+            "title": "Flotherm 基础培训教程",
+            "thumbnail": "courses/flotherm_basic.jpg",
+            "description": "Flotherm 基础培训教程",
+            "price": 0,
+            "feature": false,
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z",
+            "users": [],
+            "tags": [
+                1,
+                3
+            ]
+        }
+    },
+    {
+        "model": "courses.course",
+        "pk": 2,
+        "fields": {
+            "title": "Flotherm 自然散热分析实例",
+            "thumbnail": "courses/example_analysis_1.jpg",
+            "description": "Flotherm 自然散热分析实例",
+            "price": 0,
+            "feature": true,
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z",
+            "users": [],
+            "tags": [
+                1,
+                4
+            ]
+        }
+    },
+    {
+        "model": "courses.course",
+        "pk": 3,
+        "fields": {
+            "title": "热设计基础培训教程",
+            "thumbnail": "courses/thermal_basic.jpg",
+            "description": "热设计基础培训教程",
+            "price": 500,
+            "feature": false,
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z",
+            "users": [],
+            "tags": [
+                3
+            ]
+        }
+    },
+    {
+        "model": "courses.course",
+        "pk": 4,
+        "fields": {
+            "title": "Icepak 基础培训教程",
+            "thumbnail": "courses/icepak_basic.png",
+            "description": "Icepak 基础培训教程",
+            "price": 0,
+            "feature": false,
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z",
+            "users": [],
+            "tags": [
+                2,
+                3
+            ]
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 1,
+        "fields": {
+            "title": "Flotherm简介",
+            "course": 1,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1zh411U7qn",
+            "content": "## Flotherm简介",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 2,
+        "fields": {
+            "title": "Flotherm界面介绍",
+            "course": 1,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1Jy4y147nq",
+            "content": "## Flotherm界面介绍",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 3,
+        "fields": {
+            "title": "Flotherm创建模型",
+            "course": 1,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV175411w7Wd",
+            "content": "## Flotherm创建模型",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 4,
+        "fields": {
+            "title": "Flotherm导入EDA",
+            "course": 1,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1NU4y1b7Jc",
+            "content": "## Flotherm导入EDA",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 5,
+        "fields": {
+            "title": "Flotherm网格划分",
+            "course": 1,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1sB4y1F7v3",
+            "content": "本节介绍了Flotherm网格划分的基础知识,包括全局网格设置、局部网格细化、网格膨胀等,并解释了如何根据模型特点合理设置网格参数,以及如何查看和优化网格质量。视频强调了理解网格划分原理的重要性,并提醒用户要合理利用有限的计算资源,将细网格应用于关键区域。## 您可能对以下问题感兴趣:- 如何理解Flotherm中的minimum size和maximum size参数?- 如何根据模型特点合理设置网格参数?- 如何查看和优化Flotherm中的网格质量?",
+            "created_at": null,
+            "updated_at": "2024-05-31T01:23:18.699Z"
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 6,
+        "fields": {
+            "title": "Flotherm求解设置",
+            "course": 1,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1dU4y1L7sT",
+            "content": "## Flotherm求解设置",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 7,
+        "fields": {
+            "title": "Flotherm后处理",
+            "course": 1,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1Xq4y1L7wz",
+            "content": "## Flotherm后处理",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 8,
+        "fields": {
+            "title": "Flotherm 自然散热分析实例(上)",
+            "course": 2,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1b44y1m7qz",
+            "content": "## Flotherm 自然散热分析实例(上)",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 9,
+        "fields": {
+            "title": "Flotherm 自然散热分析实例(下)",
+            "course": 2,
+            "free_preview": false,
+            "video_source": "bili",
+            "video_url": "BV1ho4y1D7ft",
+            "content": "## Flotherm 自然散热分析实例(下)",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 10,
+        "fields": {
+            "title": "导入EDA PCB",
+            "course": 3,
+            "free_preview": false,
+            "video_source": "qiniu",
+            "video_url": "23-03-09/4_3.mp4",
+            "content": "## 导入EDA PCB",
+            "created_at": null,
+            "updated_at": null
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 11,
+        "fields": {
+            "title": "Icepak 简介",
+            "course": 4,
+            "free_preview": false,
+            "video_source": "qiniu",
+            "video_url": "02_icepak/let01_icepak_introduce.mp4",
+            "content": "# Icepak课程讲座主要内容## Icepak 简介- Icepak是专门用于电子产品热设计仿真的软件。- 不适用于模拟焊接等非热分析过程。- 提供从封装到系统级的热防震应用。- 与Workbench平台相衔接，增强前后处理能力。## CFD仿真步骤1. **明确仿真目的**：需要明确、简单、可执行。2. **建模**：   - 使用 Icepak 内建对象或从CAD导入模型。   - 定义材料和热流体特性。3. **网格划分**：提供多种网格类型和细化功能。4. **求解**：   - 支持时间相关和稳态分析。   - 支持多种热量传递方式，如对流、传导等。5. **结果分析与评估**：监控残差曲线，定义监控点，支持并行求解。## 仿真目的的重要性- 明确仿真目的，以指导后续步骤。- 了解希望得到的结果及其合理范围。- 验证仿真结果，考虑误差和经验的影响。## 建模方法- 使用 Icepak 内建对象或从CAD导入。- 定义材料库中的材料或自定义材料。- 定义边界条件，如固定、温度相关、湿度相关等。- 使用预定义组件，如风扇、散热器等。## 网格划分与求解- 支持多种网格类型和细化功能。- 求解过程中可以监控残差曲线和定义监控点。- 支持并行求解，提高效率。## 后处理- 提供多种结果输出方式，包括图形、云图、切面图、文字报告、曲线图和动画。- 可以设置温度阀值，超过警戒值的对象以不同颜色显示。## Icepak 文件结构- 每个项目创建一个文件夹，包含项目定义文件（如job, model, problem）。- 包含网格划分结果、求解结果、后处理报告和保存的图片。- 项目文件可以打包为TZR格式，便于传输和重现。",
+            "created_at": "2024-06-01T11:22:18.370Z",
+            "updated_at": "2024-06-01T11:28:48.120Z"
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 12,
+        "fields": {
+            "title": "Icepak 界面介绍",
+            "course": 4,
+            "free_preview": false,
+            "video_source": "qiniu",
+            "video_url": "02_icepak/let0201_gui_introduce.mp4",
+            "content": "# Icepak软件界面介绍 ## 用户界面组成 - **主菜单**：位于界面顶部，包含软件的主要功能。 - **标题栏**：显示项目名称。 - **快捷工具栏**：提供快速访问常用工具的选项。 - **模型树**：管理所有对象的区域。 - **模型工具栏**：快捷创建常用对象和编辑操作。 - **图形显示区域**：展示模型和后处理结果。 - **信息窗口**：显示命令执行过程中的输出和错误提示。 - **对象几何特性窗口**（COG）：显示选中对象的几何参数，支持快速编辑。 ## 菜单功能介绍 - **文件菜单**： - 新建项目 - 打开项目 - 合并项目：允许与不同项目合并模型。 - 重新加载主版本：重新加载项目的主要修订版本。 - 导入：导入IGS等CAD模型或Excel文件。 - 导出：导出模型为CAD格式或材料定义为Excel文件。 - 解包/打包项目：方便项目文件的传输和存储。 - 清理项目：清除项目中的不必要数据，减小文件夹大小。 - 打印屏幕/创建图形文件：将当前图形显示区域保存为图片。 - 调用DOS窗口。 - **编辑菜单**： - Undo/Redo：撤销和重做操作。 - 查找：通过名称快速查找模型。 - 剪切板功能：对齐到视图网格等。 - 首选项：设置软件的偏好选项。 - 图形标注：添加直线、文字描述等。 - **视图菜单**： - Summary：显示所有对象的属性和材料的总结。 - Location：选择一个点为中心进行视图旋转。 - 编辑工具栏：自定义工具栏显示。 - 显示方式：选择模型的渲染方式（实体、线框、渲染加边线）。 - Orientation：设置模型的查看方向。 - 快捷键：掌握快捷键以方便操作。 - **模型树内容**： - 求解设置：包括迭代步数、收敛条件等。 - Group：将对象分组以方便管理。 - 后处理结果：存放求解后的结果。 - 监控点：所有监控点的设置。 - 删除对象/不活动对象：管理不参与运算的对象。 ## 操作提示 - 掌握快捷键以提高操作效率。 - 利用模型树和工具栏进行快速编辑和管理。 - 通过信息窗口和对象几何特性窗口（COG）进行错误排查和参数编辑。",
+            "created_at": "2024-06-01T11:22:18.370Z",
+            "updated_at": "2024-06-01T11:28:48.120Z"
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 13,
+        "fields": {
+            "title": "Icepak鼠标操作",
+            "course": 4,
+            "free_preview": false,
+            "video_source": "qiniu",
+            "video_url": "02_icepak/let0202_mouse_control.mp4",
+            "content": "# Icepak鼠标操作 ## 鼠标操作方式 - **左键拖动**：旋转物体或整个对象。 - **中键拖动**：平移模型。 - **右键上下拖动**：放大和缩小视图。 - **右键左右拖动**：绕屏幕平面中心旋转视图。 ## 对象操作 - **Shift + 左键**：选择对象，通常用于选择对象的边。 - 连续点击左键：在多个共边对象间切换选中。 - **Shift + 中键**：拖动平移选中的对象。 - **Shift + 右键**：默认调出编辑菜单。 - 可以设置为拉伸选中的边，需在选项中设置。 ## 在Assembly中的操作 - **Shift + 左键**：选中Assembly中的边，同时展开Assembly内部对象。 ## 鼠标操作演示 1. **创建项目**：启动Icepak并创建新项目。 2. **旋转视图**：按住Shift键加鼠标左键旋转。 3. **平移视图**：按住中键平移。 4. **缩放视图**：按住右键上下拖动放大或缩小。 5. **绕屏幕旋转**：按住右键左右拖动。 ## 对象选择与移动 1. **选择对象**：按住Shift键加左键点选对象。 2. **移动对象**：选中对象后，结合中键拖动到指定位置。 ## 编辑对象 - **编辑菜单**：Shift键加右键，默认调出，可修改对象属性。 - **拉伸边**：设置后，Shift键加右键可以拉伸选中的边。 ## 练习建议 - 通过练习熟练掌握Shift键与其他鼠标键的组合操作。 ## 特别说明 - 在Assembly中，连续点击可以切换选中共边的对象，直到选中所需对象。 - 鼠标操作虽简单，但灵活运用需要多加练习。",
+            "created_at": "2024-06-01T11:22:18.370Z",
+            "updated_at": "2024-06-01T11:28:48.120Z"
+        }
+    },
+    {
+        "model": "courses.lesson",
+        "pk": 14,
+        "fields": {
+            "title": "Icepak 对齐工具介绍",
+            "course": 4,
+            "free_preview": false,
+            "video_source": "qiniu",
+            "video_url": "02_icepak/let0203_align_tools.mp4",
+            "content": "# Icepak中对齐工具及Icepak单位设置介绍 ## 对象对齐的重要性 - 对象间小间隙可能导致网格划分质量差。 - 求解收敛困难。 - 结果与预期不符。 ## 对齐方式的定义 1. **Inline Align**：对象边共线但不需要接触。 2. **Aligned and Touching**：对象对齐且接触。 3. **Match Edge**：对象对齐且长度一致。 ## 对齐方法 1. **视图网格对齐** - 类似于PowerPoint中的背景网格。 - 对象吸附到网格上，消除小间隙。 - 通过`view display visible grid`打开网格。 - 网格尺寸在`added preference option`中设置。 2. **对齐工具** - 在对象编辑工具栏中。 - 包括`online face`、`align andage`、`align vertex`等。 - 左键使用时可能修改对象尺寸。 - 右键使用时对象尺寸不变，仅移动对象。 3. **坐标捕捉方法** - 在COG对话框中直接修改坐标。 - 切换到轴向视图以确保正确选择。 ## 单位设置 - 对象和物理量都有单位。 - 可以单独设置每个物理量的单位。 - 常用单位设置在`added performance unit`中。 - 新建对象默认使用设定的单位。 - 使用`set Alt Deforce`更改已有对象单位。 - `set word Si`将所有物理量转换为国际单位制。 ## 单位转换 - 编辑对象时，使用`fix you`保持物理尺寸不变进行单位转换。 - 不使用`fix you`时，数值不变但物理长度改变。 ## 总结 - 对齐工具虽简单，但需多加练习。 - 灵活运用对齐工具对建模操作非常有帮助。 ",
+            "created_at": "2024-06-01T11:22:18.370Z",
+            "updated_at": "2024-06-01T11:28:48.120Z"
+        }
+    },
+    {
+        "model": "courses.tag",
+        "pk": 1,
+        "fields": {
+            "name": "Flotherm",
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z"
+        }
+    },
+    {
+        "model": "courses.tag",
+        "pk": 2,
+        "fields": {
+            "name": "Icepak",
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z"
+        }
+    },
+    {
+        "model": "courses.tag",
+        "pk": 3,
+        "fields": {
+            "name": "热设计",
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z"
+        }
+    },
+    {
+        "model": "courses.tag",
+        "pk": 4,
+        "fields": {
+            "name": "实例教程",
+            "created_at": "2024-05-18T00:00:00Z",
+            "updated_at": "2024-05-18T00:00:00Z"
+        }
+    }
+]

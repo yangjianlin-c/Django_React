@@ -21,7 +21,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { logout } from "@/api/auth"
-import { getCurrentUser } from "@/api/auth"
+import { getCurrentUser } from "@/api/user"
 
 export function SiteHeader() {
     const [isLoggedIn, setIsLoggedIn] = useState(false)

@@ -1,6 +1,5 @@
 from typing import List
 
-from django.contrib.auth import authenticate, logout as auth_logout
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
@@ -8,85 +7,21 @@ from django.template.loader import render_to_string
 
 from ninja import Router
 from ninja.errors import HttpError
-from ninja.security import HttpBearer
-
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from courses.models import Course, Order
+from courses.models import Course
+from orders.models import Order
 from users.models import UserProfile
-
+from auth.api import JWTAuth
 from .schemas import (
-    ChangePasswordSchema,
     EmailSchema,
-    LoginSchema,
     OrderSchema,
     UpdateProfileSchema,
-    UserCreateSchema,
-    UserProfileSchema,
 )
 from courses.schemas import CourseSchema
 
-
-user_router = Router(tags=["user"])
-
-
-class JWTAuth(HttpBearer):
-    def authenticate(self, request, token):
-        try:
-            auth = JWTAuthentication()
-            validated_token = auth.get_validated_token(token)
-            user = auth.get_user(validated_token)
-            return user
-        except Exception:
-            return None
+user_router = Router(tags=["user"], auth=JWTAuth())
 
 
-# 用户相关接口
-@user_router.post("/register")
-def register(request, data: UserCreateSchema):
-    # 检查用户名是否已存在
-    if User.objects.filter(username=data.username).exists():
-        raise HttpError(400, "用户名已存在")
-
-    user = User.objects.create_user(
-        username=data.username, email=data.email, password=data.password
-    )
-    # 生成 JWT 令牌
-    refresh = RefreshToken.for_user(user)
-    # 返回响应
-    return {
-        "message": "User created successfully!",
-        "access": str(refresh.access_token),
-        "refresh": str(refresh),
-    }
-
-
-@user_router.post("/login")
-def login(request, data: LoginSchema):
-    try:
-        user = User.objects.get(username=data.username)
-    except User.DoesNotExist:
-        raise HttpError(404, "用户名不存在")
-
-    user = authenticate(username=data.username, password=data.password)
-    if user is not None:
-        refresh = RefreshToken.for_user(user)
-        return {
-            "message": "登录成功",
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
-        }
-    raise HttpError(401, "用户名或密码错误")
-
-
-@user_router.post("/logout")
-def logout(request):
-    auth_logout(request)
-    return {"success": True, "message": "已登出"}
-
-
-@user_router.get("/me", auth=[JWTAuth()])
+@user_router.get("/me")
 def get_me(request):
     user = request.auth
     profile = getattr(user, "profile", None)
@@ -97,21 +32,11 @@ def get_me(request):
         "last_name": user.last_name,
         "role": getattr(profile, "role", "user"),
         "vip_expiry_date": getattr(profile, "vip_expiry_date", None) or "",
-        "avatar_url": profile.avatar.url or "",
+        "avatar_url": profile.avatar.url if profile and profile.avatar else "",
     }
 
 
-@user_router.post("/change_password", auth=[JWTAuth()])
-def change_password(request, data: ChangePasswordSchema):
-    user = request.auth
-    if not check_password(data.old_password, user.password):
-        return {"success": False, "message": "原密码错误"}
-    user.set_password(data.new_password)
-    user.save()
-    return {"success": True, "message": "密码修改成功"}
-
-
-@user_router.post("/update_profile", auth=[JWTAuth()])
+@user_router.post("/update_profile")
 def update_profile(request, data: UpdateProfileSchema):
     user = request.auth
     user.email = data.email
@@ -121,7 +46,7 @@ def update_profile(request, data: UpdateProfileSchema):
     return {"success": True, "message": "资料更新成功"}
 
 
-@user_router.get("/orders", response=List[OrderSchema], auth=[JWTAuth()])
+@user_router.get("/orders", response=List[OrderSchema])
 def list_orders(request):
     user = request.auth
     orders = Order.objects.filter(user=user)
@@ -153,7 +78,7 @@ def send_welcome_email(request, data: EmailSchema):
         return {"success": False, "message": f"欢迎邮件发送失败: {str(e)}"}
 
 
-@user_router.get("/my_courses", response=List[CourseSchema], auth=[JWTAuth()])
+@user_router.get("/my_courses", response=List[CourseSchema])
 def list_my_courses(request):
     user = request.auth
     profile = getattr(user, "profile", None)
@@ -170,7 +95,7 @@ def list_my_courses(request):
     return Course.objects.filter(id__in=course_ids)
 
 
-@user_router.post("/upload_avatar", auth=[JWTAuth()])
+@user_router.post("/upload_avatar")
 def upload_avatar(request):
     user = request.auth
     profile = getattr(user, "profile", None)

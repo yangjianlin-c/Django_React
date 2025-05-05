@@ -11,9 +11,9 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tag, Video, Unlock, Lock } from "lucide-react"
-
+import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { getCurrentUser } from "@/api/auth"
+import { getCurrentUser } from "@/api/user"
 import { getCourse, createOrderForCourse } from "@/api/course"
 
 type Video = {
@@ -39,7 +39,7 @@ type Course = {
   price: number
   image: string
   tags: Tag[]
-  videos: Video[]
+  lessons: Video[]
   enrolled_users: any[]
 }
 
@@ -58,7 +58,8 @@ export default function CoursePage({ params }) {
         // 获取课程信息
         if (courseId !== null) { // Use the unwrapped courseId
           const data = await getCourse(courseId);
-          setCourse(data);
+          console.log("course data:", data.data);
+          setCourse(data.data);
         }
       } catch (error) {
         console.error("获取数据失败:", error);
@@ -99,8 +100,8 @@ export default function CoursePage({ params }) {
       setCourse(data);
 
       // 如果是免费课程，直接跳转到第一个视频
-      if (course.price === 0 && course.videos.length > 0) {
-        router.push(`/courses/${course.id}/videos/${course.videos[0].id}`);
+      if (course.price === 0 && course.lessons.length > 0) {
+        router.push(`/courses/${course.id}/videos/${course.lessons[0].id}`);
       }
     } catch (error) {
       toast.error("购买失败，请稍后重试");
@@ -127,6 +128,15 @@ export default function CoursePage({ params }) {
           <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
             <div className="space-y-4">
               <h1 className="text-3xl font-bold">{course.title}</h1>
+              <div className="overflow-hidden rounded-lg">
+                <Image
+                  src={course.thumbnail ? course.thumbnail : `/${course.id}.png`}
+                  alt={course.title}
+                  width={800}
+                  height={400}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Tag className="h-4 w-4" />
                 <span>￥{course.price}</span>
@@ -170,19 +180,19 @@ export default function CoursePage({ params }) {
             <Card>
               <CardHeader>
                 <CardTitle>课程目录</CardTitle>
-                <CardDescription>共{course.videos.length}个章节</CardDescription>
+                <CardDescription>共{course.lessons.length}个章节</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {course.videos.map((video) => (
+                {course.lessons.map((lesson) => (
                   <div
-                    key={video.id}
+                    key={lesson.id}
                     className="flex items-center justify-between rounded-lg border p-4 hover:bg-accent"
                   >
                     <div className="flex items-center gap-4">
                       <Video className="h-5 w-5 text-muted-foreground" />
-                      <span>{video.title}</span>
+                      <span>{lesson.title}</span>
                       {/* 免费课程不显示“可试看”标签，因为所有都可看 */}
-                      {!isFreeCourse && video.is_free_preview && (
+                      {!isFreeCourse && lesson.is_free_preview && (
                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                           可试看
                         </span>
@@ -190,7 +200,7 @@ export default function CoursePage({ params }) {
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-muted-foreground">
-                        {video.duration}
+                        {lesson.duration}
                       </span>
                       <Button
                         size="sm"
@@ -198,14 +208,14 @@ export default function CoursePage({ params }) {
                         asChild
                         // 如果课程免费，按钮永远不禁用
                         // 否则，按原来的逻辑：!video.is_free_preview && !hasPurchased
-                        disabled={!isFreeCourse && !video.is_free_preview && !hasPurchased}
+                        disabled={!isFreeCourse && !lesson.is_free_preview && !hasPurchased}
                       >
-                        <Link href={`/courses/${course.id}/videos/${video.id}`}>
+                        <Link href={`/courses/${course.id}/videos/${lesson.id}`}>
                           {/* 如果课程免费，显示“观看” */}
                           {/* 否则，按原来的逻辑 */}
                           {isFreeCourse
                             ? "观看"
-                            : video.is_free_preview
+                            : lesson.is_free_preview
                               ? "试看"
                               : hasPurchased
                                 ? "观看"

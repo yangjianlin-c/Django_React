@@ -1,23 +1,32 @@
 from ninja import Router
 from ninja.errors import HttpError
 from typing import List
-from courses.schemas import CourseSchema, CourseDetailSchema, LessonSchema
-from courses.models import Course, Lesson, Order
+from courses.schemas import CourseSchema, CourseDetailSchema, LessonSchema, TagSchema
+from courses.models import Course, Lesson, Tag
+from orders.models import Order
 from ninja.pagination import paginate, PageNumberPagination
-
 
 course_router = Router(tags=["course"])
 
 
+# 获取所有标签列表
+@course_router.get("/tags", response=List[TagSchema])
+def list_tags(request):
+    return Tag.objects.all()
+
+
+# 课程列表接口
 @course_router.get("/courses", response=List[CourseSchema])
 @paginate(PageNumberPagination)
-def list_courses(request):
+def list_courses(request, tag_id: int = None):
     courses = Course.objects.all()
+    if tag_id:
+        courses = courses.filter(tags__id=tag_id)
     return courses
 
 
 # 课程详情接口
-@course_router.get("/courses/{course_id}", response=CourseDetailSchema)
+@course_router.get("/{course_id}", response=CourseDetailSchema)
 def get_course(request, course_id: int):
     try:
         course = Course.objects.get(id=course_id)
@@ -55,7 +64,7 @@ def get_course(request, course_id: int):
 
 
 # 课时详情接口
-@course_router.get("/lessons/{lesson_id}", response=LessonSchema)
+@course_router.get("/lesson/{lesson_id}", response=LessonSchema)
 def get_lesson(request, lesson_id: int):
     try:
         lesson = Lesson.objects.get(id=lesson_id)
@@ -63,7 +72,7 @@ def get_lesson(request, lesson_id: int):
     except Lesson.DoesNotExist:
         raise HttpError(404, "课时不存在")
     # 权限判断：免费课时所有人可访问，付费课时仅VIP或已购买用户可访问
-    if not lesson.is_free and course.price > 0:
+    if not lesson.free_preview and course.price > 0:
         user = getattr(request, "user", None)
         if not user or not user.is_authenticated:
             raise HttpError(403, "请先登录")
