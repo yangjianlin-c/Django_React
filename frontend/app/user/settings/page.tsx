@@ -45,7 +45,6 @@ export default function SettingsPage() {
     const fetchUserProfile = async () => {
       try {
         const userData = await getCurrentUser();
-        console.log("用户信息:", userData.data);
 
         form.reset({
           username: userData.data.username || "",

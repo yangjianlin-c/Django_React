@@ -57,10 +57,12 @@ def login(request, data: LoginSchema):
     raise HttpError(401, "用户名或密码错误")
 
 
-@auth_router.post("/logout")
+@auth_router.post("/logout", auth=[JWTAuth()])
 def logout(request):
-    auth_logout(request)
-    return {"success": True, "message": "已登出"}
+    if request.auth:
+        auth_logout(request)
+        return {"success": True, "message": "已登出"}
+    return {"success": False, "message": "用户未登录"}
 
 
 @auth_router.post("/change_password", auth=[JWTAuth()])

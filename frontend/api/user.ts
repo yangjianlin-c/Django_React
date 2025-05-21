@@ -1,10 +1,7 @@
 import { api,backURL } from "./request";
 
-
-
 export const getCurrentUser = async () => {
   const response = await api.get('/user/me');
-
   if (response.data && response.data.avatar_url) {
     response.data.avatar_url = `${backURL}${response.data.avatar_url}`;
   }  

@@ -19,7 +19,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { getCurrentUser } from "@/api/user"
+
 
 export function SiteHeader() {
     const [user, setUser] = useState<{ name: string, image: string } | null>(null)

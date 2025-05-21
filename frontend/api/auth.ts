@@ -50,6 +50,7 @@ export const login = async (username: string, password: string) => {
 export const register = (userData: { username: string; email: string; password: string }) => 
   api.post('/auth/register', userData);
 
+
 // 退出登录
 export const logout = () => {
   removeAccessToken();

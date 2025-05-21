@@ -16,14 +16,15 @@ import { useRouter } from "next/navigation"
 import { getCurrentUser } from "@/api/user"
 import { getCourse, createOrderForCourse } from "@/api/course"
 
-type Video = {
+type Lesson = {
   id: number
   title: string
-  duration: string | null
-  source_type: string
-  url: string
-  description: string
-  is_free_preview: boolean
+  video_source: string
+  video_url: string | null
+  content: string
+  free_preview: boolean
+  created_at: string | null
+  updated_at: string | null
   course_id: number
 }
 
@@ -37,9 +38,9 @@ type Course = {
   title: string
   description: string
   price: number
-  image: string
+  thumbnail: string
   tags: Tag[]
-  lessons: Video[]
+  lessons: Lesson[]
   enrolled_users: any[]
 }
 
@@ -192,30 +193,27 @@ export default function CoursePage({ params }) {
                       <Video className="h-5 w-5 text-muted-foreground" />
                       <span>{lesson.title}</span>
                       {/* 免费课程不显示“可试看”标签，因为所有都可看 */}
-                      {!isFreeCourse && lesson.is_free_preview && (
+                      {!isFreeCourse && lesson.free_preview && (
                         <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                           可试看
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-muted-foreground">
-                        {lesson.duration}
-                      </span>
                       <Button
                         size="sm"
                         variant="outline"
                         asChild
                         // 如果课程免费，按钮永远不禁用
-                        // 否则，按原来的逻辑：!video.is_free_preview && !hasPurchased
-                        disabled={!isFreeCourse && !lesson.is_free_preview && !hasPurchased}
+                        // 否则，按原来的逻辑：!video.free_preview && !hasPurchased
+                        disabled={!isFreeCourse && !lesson.free_preview && !hasPurchased}
                       >
-                        <Link href={`/courses/${course.id}/videos/${lesson.id}`}>
+                        <Link href={`/course/lesson/${lesson.id}`}>
                           {/* 如果课程免费，显示“观看” */}
                           {/* 否则，按原来的逻辑 */}
                           {isFreeCourse
                             ? "观看"
-                            : lesson.is_free_preview
+                            : lesson.free_preview
                               ? "试看"
                               : hasPurchased
                                 ? "观看"

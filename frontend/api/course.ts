@@ -39,7 +39,7 @@ export function listLessons(course_id: number) {
 
 // 获取单个课时详情
 export function getLesson(lesson_id: number) {
-  return api({ method: "GET", url: `course/lessons/${lesson_id}` });
+  return api({ method: "GET", url: `course/lesson/${lesson_id}` });
 }
 
 // 为课程创建订单

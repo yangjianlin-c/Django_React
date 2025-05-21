@@ -11,7 +11,8 @@ import { SiteFooter } from "@/components/site-footer"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tag } from "lucide-react"
 import { FileText, Ruler, Wrench } from "lucide-react"
-import { listCourses } from "@/api/course"
+import api from '@/lib/api'
+
 
 export default function IndexPage() {
     const [courses, setCourses] = useState([])
@@ -21,11 +22,11 @@ export default function IndexPage() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await listCourses()
+                const response = await api.get('/courses/courses')
                 setCourses(response.data.items)
                 setError(null)
             } catch (err) {
-                setError('获取课程列表失败')
+                // setError('获取课程列表失败')
                 console.error('获取课程列表失败:', err)
             } finally {
                 setLoading(false)

@@ -105,23 +105,23 @@ export default function CoursesPage({ params, searchParams }: CoursesPageProps) 
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                 {courses.map((course) => (
                                     <Card key={course.id} className="pt-0">
-                                        <Link href={`/course/${course.id}`}>
-                                            <div className="overflow-hidden rounded-t-lg">
-                                                <Image
-                                                    src={course.thumbnail ? course.thumbnail : `/${course.id}.png`}
-                                                    alt={course.title}
-                                                    width={400}
-                                                    height={200}
-                                                    className="h-auto w-auto object-cover transition-all hover:scale-105 aspect-[2/1]"
-                                                />
-                                            </div>
-                                        </Link>
+
+                                        <div className="overflow-hidden rounded-t-lg">
+                                            <Link href={`/course/${course.id}`}><Image
+                                                src={course.thumbnail ? course.thumbnail : `/${course.id}.png`}
+                                                alt={course.title}
+                                                width={400}
+                                                height={200}
+                                                className="h-auto w-auto object-cover transition-all hover:scale-105 aspect-[2/1]"
+                                            /></Link>
+                                        </div>
+
                                         <CardHeader>
                                             <div className="text-sm text-muted-foreground pb-2 flex items-center gap-2">
                                                 <Tag className="h-4 w-4" />
                                                 ￥{course.price}
                                             </div>
-                                            <CardTitle>{course.title}</CardTitle>
+                                            <Link href={`/course/${course.id}`}> <CardTitle>{course.title}</CardTitle></Link>
                                             <CardDescription>{course.description}</CardDescription>
                                         </CardHeader>
                                         <CardFooter>
